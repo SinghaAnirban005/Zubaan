@@ -3,9 +3,12 @@ import { upload } from "../middlewares/multer";
 import { audioProcessor } from "../packages/audio";
 import { SpeechToText } from "../packages/STT";
 
+import { HinglishService } from "../packages/hinglish";
+
 const router: Router = Router()
 
 const speechToText = SpeechToText.getInstance()
+const highlishProcessor = HinglishService.getInstance()
 
 router.post('/upload', upload.single("video"), async(req: Request, res: Response) => {
     try {
@@ -36,6 +39,32 @@ router.post('/upload', upload.single("video"), async(req: Request, res: Response
         return
     } catch (error) {
         
+    }
+})
+
+router.post('/generate', async(req, res) => {
+    try {
+        const { sentences } = req.body
+
+        if(!sentences){
+            res.status(400).json({
+                message: "Missing input"
+            })
+            return
+        }
+
+        const result = await highlishProcessor.convert(sentences)
+
+        return res.status(200).json({
+            message: 'Converted to hinglish',
+            data: result
+        })
+    } catch (error) {
+        console.error(error)
+        
+        return res.status(500).json({
+            message: 'Server error'
+        })
     }
 })
 
