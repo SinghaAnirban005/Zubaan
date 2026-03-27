@@ -11,6 +11,8 @@ server/node_modules
 !.yarn/releases
 !.yarn/versions
 
+server/dist
+
 # testing
 /coverage
 
@@ -40,3 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+server/uploads
+server/audio

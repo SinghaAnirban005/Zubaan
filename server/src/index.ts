@@ -1,8 +1,11 @@
 import express, { Express } from "express"
 import dotenv from "dotenv"
-import audioRouter from "../src/routers/audio.router"
+import audioRouter from "./routers/audio.router"
+import path from 'path'
 
-dotenv.config()
+dotenv.config({
+    path: path.resolve(__dirname, "../../.env")
+})
 
 const app: Express = express()
 
