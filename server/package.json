@@ -13,6 +13,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.6",
     "@types/fluent-ffmpeg": "^2.1.28",
