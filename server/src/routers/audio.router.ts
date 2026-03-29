@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { upload } from "../middlewares/multer";
 import { audioProcessor } from "../packages/audio";
 import { SpeechToText } from "../packages/STT";
+import fs from "fs"
 
 import { HinglishService } from "../packages/hinglish";
 
@@ -33,7 +34,8 @@ router.post('/upload', upload.single("video"), async(req: Request, res: Response
 
         res.status(200).json({
             message: "Transcript ready !!",
-            transcript: transcript
+            transcript: transcript,
+            videoPath: videoPath
         })
 
         return
@@ -44,7 +46,7 @@ router.post('/upload', upload.single("video"), async(req: Request, res: Response
 
 router.post('/generate', async(req, res) => {
     try {
-        const { sentences } = req.body
+        const { sentences, videoPath } = req.body
 
         if(!sentences){
             res.status(400).json({
@@ -53,10 +55,16 @@ router.post('/generate', async(req, res) => {
             return
         }
 
+        if (!videoPath || !fs.existsSync(videoPath)) {
+            res.status(400).json({ error: 'videoPath missing or file no longer exists' })
+            return
+        }
+
         const result = await highlishProcessor.convert(sentences)
 
         return res.status(200).json({
             message: 'Converted to hinglish',
+            videoPath: videoPath,
             data: result
         })
     } catch (error) {
