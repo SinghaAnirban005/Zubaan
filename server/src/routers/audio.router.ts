@@ -6,6 +6,7 @@ import fs from "fs"
 
 import { HinglishService } from "../packages/hinglish";
 import { CleanerService } from "../packages/cleaner";
+import { prisma } from "../lib/prisma";
 
 const router: Router = Router()
 

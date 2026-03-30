@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { SubtitleGenerator } from "../packages/subtitle";
 import fs from "fs"
+import { prisma } from "../lib/prisma";
 
 const router: Router = Router()
 
@@ -46,6 +47,14 @@ router.post('/generate', async(req, res) => {
 })
 
 router.post('/burn', async (req: Request, res: Response) => {
+  const job = await prisma.subtitle.create({
+    data: {
+      userId: '',
+      srtData: '',
+      status: 'PENDING'
+    }
+  })
+
   const { srt, videoPath } = req.body
 
   if (!srt || !videoPath) {
@@ -57,6 +66,15 @@ router.post('/burn', async (req: Request, res: Response) => {
     res.status(404).json({ error: 'Video file not found — it may have been cleaned up. Re-upload.' })
     return
   }
+
+  await prisma.subtitle.update({
+    where: {
+      id: job.id
+    },
+    data: {
+      srtData: srt
+    }
+  })
 
   const srtPath    = `${videoPath}.srt`
   const outputPath = `${videoPath}_burned.mp4`
@@ -71,10 +89,27 @@ router.post('/burn', async (req: Request, res: Response) => {
     const readStream = fs.createReadStream(outputPath)
     readStream.pipe(res)
 
-    readStream.on('close', () => {
+    readStream.on('close', async() => {
       // Cleanup everything including original upload
       [videoPath, srtPath, outputPath].forEach((f) => {
         if (fs.existsSync(f)) fs.unlinkSync(f)
+      })
+
+      await prisma.subtitle.update({
+      where: {
+        id: job.id
+      },
+      data: {
+        status: 'DONE'
+      }
+    })
+    })
+
+    readStream.on('error', async (streamErr) => {
+      console.error('Stream error:', streamErr)
+      await prisma.subtitle.update({
+        where: { id: job.id },
+        data:  { status: 'FAILED' }
       })
     })
 
@@ -82,6 +117,14 @@ router.post('/burn', async (req: Request, res: Response) => {
     [srtPath, outputPath].forEach((f) => {
       if (fs.existsSync(f)) fs.unlinkSync(f)
     })
+
+    await prisma.subtitle.update({
+      where: { id: job.id },
+      data: {
+        status: 'FAILED'
+      }
+    })
+
     res.status(500).json({ error: err })
   }
 })
