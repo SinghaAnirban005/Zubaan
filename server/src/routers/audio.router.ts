@@ -5,8 +5,11 @@ import { SpeechToText } from "../packages/STT";
 import fs from "fs"
 
 import { HinglishService } from "../packages/hinglish";
+import { CleanerService } from "../packages/cleaner";
 
 const router: Router = Router()
+
+const cleaner = CleanerService.getInstance()
 
 const speechToText = SpeechToText.getInstance()
 const highlishProcessor = HinglishService.getInstance()
@@ -40,7 +43,11 @@ router.post('/upload', upload.single("video"), async(req: Request, res: Response
 
         return
     } catch (error) {
+        console.error(error)
         
+        return res.status(500).json({
+            message: error
+        })
     }
 })
 
@@ -62,10 +69,13 @@ router.post('/generate', async(req, res) => {
 
         const result = await highlishProcessor.convert(sentences)
 
+        const cues = await cleaner.chunkIntoWords(result, 3)
+
         return res.status(200).json({
             message: 'Converted to hinglish',
             videoPath: videoPath,
-            data: result
+            data: result,
+            cues: cues
         })
     } catch (error) {
         console.error(error)
