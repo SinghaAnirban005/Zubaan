@@ -1,5 +1,9 @@
 import { CleanerService } from "./cleaner";
 import ffmpeg from "fluent-ffmpeg"
+import { ASSProcessor } from "./ASS";
+import fs  from "fs"
+
+const assProcessor = ASSProcessor.getInstance()
 
 class SubtitleGenerator {
     private static instance: SubtitleGenerator
@@ -41,38 +45,49 @@ class SubtitleGenerator {
         return srtBlocks.join('\n\n');
     }
 
-    burnSubtitles(inputPath: string, srtPath: string, outputPath: string){
-        return new Promise((resolve, reject) => {
+    burnSubtitles(
+      inputPath: string,
+      srtPath: string,
+      outputPath: string
+    ): Promise<void> {
+      return new Promise((resolve, reject) => {
 
-    const escapedSrtPath = srtPath.replace(/\\/g, '/').replace(/:/g, '\\:');
+        // probe video dimensions so ASS PlayRes matches actual video
+        ffmpeg.ffprobe(inputPath, (err, meta) => {
+          if (err) {
+            console.error('ffprobe FAILED:', err)
+            return reject(err)
+          }
 
-    // ASS subtitle style override — controls how subs look on video
-    const subtitleStyle = [
-      'FontName=Arial',
-      'FontSize=18',
-      'PrimaryColour=&H00FFFFFF',
-      'OutlineColour=&H00000000',
-      'Outline=2',
-      'Bold=1',
-      'Alignment=2',
-      'MarginV=30',
-    ].join(',');
+          const stream     = meta.streams.find(s => s.codec_type === 'video')
+          const videoWidth  = stream?.width  ?? 1280
+          const videoHeight = stream?.height ?? 720
 
-    ffmpeg(inputPath)
-      .outputOptions([
-        '-vf', `subtitles=${escapedSrtPath}:force_style='${subtitleStyle}'`,
-        '-c:v', 'libx264',
-        '-c:a', 'copy',
-        '-preset', 'fast',
-        '-crf', '23',
-      ])
-      .output(outputPath)
-      .on('start', (cmd) => console.log('ffmpeg started:', cmd))
-      .on('progress', (p) => console.log(`Encoding: ${Math.round(p.percent ?? 0)}%`))
-      .on('end', resolve)
-      .on('error', reject)
-      .run();
-  });
+          const assPath = srtPath.replace('.srt', '.ass')
+          assProcessor.buildAssFile(srtPath, assPath, videoWidth, videoHeight)
+
+          const escapedAssPath = assPath.replace(/\\/g, '/').replace(/:/g, '\\:')
+          const videoFilter = `ass=${escapedAssPath}`
+
+          ffmpeg(inputPath)
+            .outputOptions([
+              '-vf',    videoFilter,
+              '-c:v',   'libx264',
+              '-c:a',   'copy',
+              '-preset','fast',
+              '-crf',   '23',
+            ])
+            .output(outputPath)
+            .on('start',    cmd => console.log(`ffmpeg: ${cmd}`))
+            .on('progress', p   => console.log(`Encoding: ${Math.round(p.percent ?? 0)}%`))
+            .on('end',   () => {
+              fs.unlinkSync(assPath);
+              resolve()
+            })
+            .on('error', err => { if (fs.existsSync(assPath)) fs.unlinkSync(assPath); reject(err) })
+            .run()
+        })
+      })
     }
 }
 
