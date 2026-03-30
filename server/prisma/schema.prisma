@@ -12,11 +12,33 @@ datasource db {
   provider = "postgresql"
 }
 
+enum JobStatus {
+  PENDING
+  DONE
+  FAILED
+}
+
 model User {
-  id          String     @id     @unique   @default(cuid())
-  googleId    String     @unique
+  id          String      @id             @unique   @default(cuid())
+  googleId    String      @unique
   name        String
-  email       String     @unique
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  email       String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  subtitles   Subtitle[]
+}
+
+model Subtitle {
+  id          String      @id               @unique   @default(cuid())
+  userId      String      @unique
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  srtData     String
+  status      JobStatus   @default(PENDING)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId])
 }
