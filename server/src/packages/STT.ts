@@ -1,5 +1,6 @@
 import { DeepgramClient } from "@deepgram/sdk"
 import fs from "fs"
+import fsPromises from "fs"
 
 class SpeechToText {
 
@@ -22,20 +23,30 @@ class SpeechToText {
 
     async getText(audioPath: string): Promise<any> {
             try {
-                const result = await this.deepgram.listen.v1.media.transcribeFile(
-                    fs.createReadStream(audioPath),
-                    {
-                    model: "nova-3",
-                    language: 'hi',
-                    smart_format: true,
-                    }
-                );
-                
-                return result
-            } catch (error) {
-                throw error
+        const result = await this.deepgram.listen.v1.media.transcribeFile(
+            fs.createReadStream(audioPath),
+            {
+                model: "nova-3",
+                language: 'hi',
+                smart_format: true,
             }
+        );
+        
+        return result;
+    } catch (error) {
+        console.error(`Transcription failed for ${audioPath}:`, error);
+        throw error;
+    } finally {
+        try {
+            if (fs.existsSync(audioPath)) {
+                await fsPromises.unlink(audioPath, () => {});
+                console.log(`Successfully deleted: ${audioPath}`);
+            }
+        } catch (cleanupError) {
+            console.error(`Failed to delete file: ${audioPath}`, cleanupError);
+        }
     }
+}
 }
 
 export { SpeechToText }
