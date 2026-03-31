@@ -4,6 +4,7 @@ import cors from "cors"
 
 import audioRouter from "./routers/audio.router"
 import subtitleRouter from "./routers/subtitle.router"
+import authRouter from "./routers/auth.router"
 
 import path from 'path'
 
@@ -21,6 +22,7 @@ app.use(cors({
 
 app.use('/api/v1/audio', audioRouter)
 app.use('/api/v1/subtitle', subtitleRouter)
+app.use('/api/v1/auth', authRouter)
 
 app.listen(3000)
 
