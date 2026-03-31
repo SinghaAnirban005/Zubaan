@@ -1,25 +1,22 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "Zubaan - Hinglish Subtitle Generator",
-  description: "Generate Hinglish subtitles in seconds"
-};
+  title: 'SubtitleGenie - Hinglish Subtitle Generator',
+  description: 'Generate accurate, context-aware Hinglish subtitles for your videos instantly. Perfect for Indian creators.',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className="bg-black text-white">
-        {children}
-      </body>
+    <html lang="en" className="dark">
+      <body className={inter.className}>{children}</body>
     </html>
-  );
+  )
 }
