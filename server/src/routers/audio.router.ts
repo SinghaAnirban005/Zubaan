@@ -6,7 +6,7 @@ import fs from "fs"
 
 import { HinglishService } from "../packages/hinglish";
 import { CleanerService } from "../packages/cleaner";
-import { prisma } from "../lib/prisma";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router: Router = Router()
 
@@ -15,7 +15,7 @@ const cleaner = CleanerService.getInstance()
 const speechToText = SpeechToText.getInstance()
 const highlishProcessor = HinglishService.getInstance()
 
-router.post('/upload', upload.single("video"), async(req: Request, res: Response) => {
+router.post('/upload', authMiddleware, upload.single("video"), async(req: Request, res: Response) => {
     try {
         const videoPath = req.file?.path
 
@@ -52,7 +52,7 @@ router.post('/upload', upload.single("video"), async(req: Request, res: Response
     }
 })
 
-router.post('/generate', async(req, res) => {
+router.post('/generate', authMiddleware, async(req, res) => {
     try {
         const { sentences, videoPath } = req.body
 

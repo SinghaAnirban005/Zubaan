@@ -1,6 +1,6 @@
 import passport from "passport"
 import { Strategy as GoogleStrategy } from "passport-google-oauth20"
-import { prisma } from "../lib/prisma"
+import { prisma } from "./prisma"
 
 passport.use(
   new GoogleStrategy(
@@ -22,9 +22,9 @@ passport.use(
           user = await prisma.user.create({
             data: {
               googleId: profile.id,
-              //@ts-ignore
-              email: profile.emails?.[0].value!,
               name: profile.displayName,
+              //@ts-ignore
+              email: profile.emails?.[0].value || ""
             }
           })
         }

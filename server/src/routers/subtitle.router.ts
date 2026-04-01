@@ -2,12 +2,13 @@ import { Router, Request, Response } from "express";
 import { SubtitleGenerator } from "../packages/subtitle";
 import fs from "fs"
 import { prisma } from "../lib/prisma";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router: Router = Router()
 
 const subtitleProcessor = SubtitleGenerator.getInstance()
 
-router.post('/generate', async(req, res) => {
+router.post('/generate', authMiddleware, async(req, res) => {
     try {
         const { sentences, videoPath } = req.body
 
@@ -46,10 +47,13 @@ router.post('/generate', async(req, res) => {
     }
 })
 
-router.post('/burn', async (req: Request, res: Response) => {
+router.post('/burn', authMiddleware, async (req: Request, res: Response) => {
+  //@ts-ignore
+  const userId = req.userId
+
   const job = await prisma.subtitle.create({
     data: {
-      userId: '',
+      userId: userId,
       srtData: '',
       status: 'PENDING'
     }
