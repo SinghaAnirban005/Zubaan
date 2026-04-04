@@ -1,17 +1,35 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { Button } from '../ui/Button'
+import { motion } from 'framer-motion';
+import { Button } from '../ui/Button';
+import { useRouter } from 'next/navigation';
 import { Sparkles, PlayCircle } from "lucide-react"
 
-export function Hero() {
+interface HeroProps {
+  onGetStarted?: () => void;
+  isAuthenticated?: boolean;
+}
+
+export function Hero({ onGetStarted, isAuthenticated }: HeroProps) {
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    } else if (onGetStarted) {
+      onGetStarted();
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+
       <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-transparent" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl animate-pulse-slow" />
       
       <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,8 +70,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-wrap items-center justify-center gap-4 mt-10"
         >
-          <Button variant="primary" size="lg" icon={<Sparkles />}>
-            Start Generating Free
+          <Button variant="primary" size="lg" icon={<Sparkles />} onClick={handleGetStarted}>
+            {isAuthenticated ? 'Go to Dashboard' : 'Start Generating Free'}
           </Button>
           <Button variant="outline" size="lg" icon={<PlayCircle />}>
             Watch Demo

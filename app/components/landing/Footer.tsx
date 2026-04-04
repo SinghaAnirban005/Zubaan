@@ -43,7 +43,7 @@ export function Footer() {
           </div>
         </div>
         <div className="pt-8 border-t border-zinc-800 text-center text-sm text-gray-500">
-          <p>&copy; 2024 SubtitleGenie. All rights reserved. Made with <span className="text-orange-500">❤️</span> for Indian creators</p>
+          <p>&copy; 2026 SubtitleGenie. All rights reserved. Made with <span className="text-orange-500">❤️</span> for Indian creators</p>
         </div>
       </div>
     </footer>
