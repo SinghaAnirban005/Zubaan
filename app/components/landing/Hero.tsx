@@ -60,7 +60,7 @@ export function Hero({ onGetStarted, isAuthenticated }: HeroProps) {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mt-6"
         >
-          Create accurate, context-aware subtitles for your videos — mixing Hindi & English,
+          Create accurate, context aware subtitles for your videos mixing Hindi & English,
           exactly the way India speaks. 98% accuracy, blazing fast.
         </motion.p>
 

@@ -26,8 +26,6 @@ export default function AuthSuccessPage() {
           
           if (response.ok) {
             const userData = await response.json();
-
-            console.log('user data ', userData)
             localStorage.setItem('user', JSON.stringify(userData.data));
           }
           
