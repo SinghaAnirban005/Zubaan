@@ -110,7 +110,6 @@ export function VideoUploader({ onUpload, isProcessing, processingStep }: VideoU
 ) : (
   <div className="space-y-6">
     <div className="flex items-center justify-center gap-3">
-      {/* Updated to Video icon */}
       <Video className="text-orange-500" size={32} /> 
       <div className="text-left">
         <p className="text-white font-medium">{selectedFile.name}</p>
@@ -118,15 +117,6 @@ export function VideoUploader({ onUpload, isProcessing, processingStep }: VideoU
           {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
         </p>
       </div>
-      {!isProcessing && (
-        <button
-          onClick={() => setSelectedFile(null)}
-          className="text-red-500 hover:text-red-400 ml-4"
-        >
-          {/* Updated to X icon */}
-          <X size={20} />
-        </button>
-      )}
     </div>
 
     {isProcessing ? (

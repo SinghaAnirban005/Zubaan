@@ -94,7 +94,6 @@ router.post('/burn', authMiddleware, async (req: Request, res: Response) => {
     readStream.pipe(res)
 
     readStream.on('close', async() => {
-      // Cleanup everything including original upload
       [videoPath, srtPath, outputPath].forEach((f) => {
         if (fs.existsSync(f)) fs.unlinkSync(f)
       })

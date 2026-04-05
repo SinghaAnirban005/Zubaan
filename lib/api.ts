@@ -29,27 +29,27 @@ class API {
     const formData = new FormData();
     formData.append('video', file);
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/audio/upload`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error('Upload failed');
+      try {
+        const response = await fetch(`${API_BASE_URL}/audio/upload`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+    
+        return response.json();
+      } catch (error) {
+        console.error(error)
+        return {
+          "transcript": "",
+          "videoPath": ""
+        }
       }
-  
-      return response.json();
-    } catch (error) {
-      console.error(error)
-      return {
-        transcript: '',
-        videoPath: ''
-      }
-    }
   }
 
   generateHinglish(

@@ -28,6 +28,10 @@ export default function DashboardPage() {
       setProcessingStep('Uploading and transcribing video...');
       const uploadResponse = await api.uploadVideo(file);
       const { transcript, videoPath } = uploadResponse;
+
+      if (!videoPath) {
+        throw new Error("Video upload failed");
+      }
       
       setProcessingStep('Processing transcript...');
       const sentences = extractSentences(transcript);

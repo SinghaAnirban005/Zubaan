@@ -52,7 +52,6 @@ class SubtitleGenerator {
     ): Promise<void> {
       return new Promise((resolve, reject) => {
 
-        // probe video dimensions so ASS PlayRes matches actual video
         ffmpeg.ffprobe(inputPath, (err, meta) => {
           if (err) {
             console.error('ffprobe FAILED:', err)

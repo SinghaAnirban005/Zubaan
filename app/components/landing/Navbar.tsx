@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { Captions } from 'lucide-react';
+import { Captions, ChevronDown, LayoutDashboard, LogOut, User } from 'lucide-react';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -69,37 +69,54 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-                    <span className="material-icons text-white text-sm">
-                      {user?.name?.charAt(0) || 'U'}
-                    </span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center overflow-hidden">
+                    {user?.name ? (
+                      <span className="text-white text-xs font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    ) : (
+                      <User className="w-4 h-4 text-white" />
+                    )}
                   </div>
-                  <span className="text-sm font-medium">{user?.name?.split(' ')[0] || 'User'}</span>
-                  <span className="material-icons text-sm">expand_more</span>
+                  <span className="text-sm font-medium text-zinc-200">
+                    {user?.name?.split(' ')[0] || 'User'}
+                  </span>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
+                      showUserMenu ? 'rotate-180' : ''
+                    }`} 
+                  />
                 </button>
-                
+
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg overflow-hidden">
-                    <button
-                      onClick={() => {
-                        router.push('/dashboard');
-                        setShowUserMenu(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-zinc-800 transition-colors"
-                    >
-                      Dashboard
-                    </button>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setShowUserMenu(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-zinc-800 transition-colors"
-                    >
-                      Sign Out
-                    </button>
+                  <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden z-50">
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          router.push('/dashboard');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-3"
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </button>
+                      
+                      <div className="h-px bg-zinc-800 mx-2 my-1" />
+
+                      <button
+                        onClick={() => {
+                          logout();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-zinc-800 transition-colors flex items-center gap-3"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
