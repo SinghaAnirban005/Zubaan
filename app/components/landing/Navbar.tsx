@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Captions, ChevronDown, LayoutDashboard, LogOut, User } from 'lucide-react';
 
 export function Navbar() {
@@ -13,6 +13,9 @@ export function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  
+  const isDashboard = pathname === '/dashboard';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -22,13 +25,101 @@ export function Navbar() {
 
   const navLinks = ['Features', 'How it works', 'Pricing', 'API'];
 
-  const handleAuthAction = () => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    } else {
-      router.push('/auth/signin');
-    }
-  };
+  // Dashboard navbar - shows user info and dropdown (only when authenticated)
+  if (isDashboard && isAuthenticated) {
+    return (
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled ? 'bg-black/90 backdrop-blur-xl border-b border-zinc-800' : 'bg-transparent'
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => router.push('/')}
+            >
+              <Captions className="text-orange-500 w-8 h-8" />
+              <span className="font-bold text-2xl tracking-tight">
+                Subtitle<span className="text-orange-500">Genie</span>
+              </span>
+            </motion.div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center overflow-hidden">
+                    {user?.name ? (
+                      <span className="text-white text-xs font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    ) : (
+                      <User className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-zinc-200">
+                    {user?.name?.split(' ')[0] || 'User'}
+                  </span>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
+                      showUserMenu ? 'rotate-180' : ''
+                    }`} 
+                  />
+                </button>
+
+                {showUserMenu && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowUserMenu(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden z-50">
+                      <div className="py-1">
+                        <div className="px-4 py-2 border-b border-zinc-800">
+                          <p className="text-xs text-zinc-400">Signed in as</p>
+                          <p className="text-sm font-medium text-zinc-200 truncate">
+                            {user?.email || user?.name || 'User'}
+                          </p>
+                        </div>
+                        
+                        <button
+                          onClick={() => {
+                            router.push('/dashboard');
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full px-4 py-2.5 text-left text-sm text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-3"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          Dashboard
+                        </button>
+                        
+                        <div className="h-px bg-zinc-800 mx-2 my-1" />
+
+                        <button
+                          onClick={() => {
+                            logout();
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-zinc-800 transition-colors flex items-center gap-3"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -65,71 +156,12 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center overflow-hidden">
-                    {user?.name ? (
-                      <span className="text-white text-xs font-bold">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    ) : (
-                      <User className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                  <span className="text-sm font-medium text-zinc-200">
-                    {user?.name?.split(' ')[0] || 'User'}
-                  </span>
-                  <ChevronDown 
-                    className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
-                      showUserMenu ? 'rotate-180' : ''
-                    }`} 
-                  />
-                </button>
-
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden z-50">
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          router.push('/dashboard');
-                          setShowUserMenu(false);
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-sm text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-3"
-                      >
-                        <LayoutDashboard className="w-4 h-4" />
-                        Dashboard
-                      </button>
-                      
-                      <div className="h-px bg-zinc-800 mx-2 my-1" />
-
-                      <button
-                        onClick={() => {
-                          logout();
-                          setShowUserMenu(false);
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-zinc-800 transition-colors flex items-center gap-3"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Sign Out
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" className='cursor-pointer' onClick={() => router.push('/auth/signin')}>
-                  Sign In
-                </Button>
-                <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => router.push('/auth/signup')}>
-                  Sign Up Free
-                </Button>
-              </>
-            )}
+            <Button variant="ghost" size="sm" className='cursor-pointer' onClick={() => router.push('/auth/signin')}>
+              Sign In
+            </Button>
+            <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => router.push('/auth/signup')}>
+              Sign Up Free
+            </Button>
           </div>
 
           <button 
@@ -158,57 +190,28 @@ export function Navbar() {
               </a>
             ))}
             <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-zinc-800">
-              {isAuthenticated ? (
-                <>
-                  <Button 
-                    variant="primary" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => {
-                      router.push('/dashboard');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Dashboard
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => {
-                      logout();
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => {
-                      router.push('/auth/signin');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Sign In
-                  </Button>
-                  <Button 
-                    variant="primary" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => {
-                      router.push('/auth/signup');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Sign Up Free
-                  </Button>
-                </>
-              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => {
+                  router.push('/auth/signin');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Sign In
+              </Button>
+              <Button 
+                variant="primary" 
+                size="sm" 
+                className="w-full"
+                onClick={() => {
+                  router.push('/auth/signup');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Sign Up Free
+              </Button>
             </div>
           </motion.div>
         )}
