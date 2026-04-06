@@ -37,16 +37,16 @@ class SpeechToText {
         console.error(`Transcription failed for ${audioPath}:`, error);
         throw error;
     } 
-    // finally {
-    //     try {
-    //         if (fs.existsSync(audioPath)) {
-    //             await fsPromises.unlink(audioPath, () => {});
-    //             console.log(`Successfully deleted: ${audioPath}`);
-    //         }
-    //     } catch (cleanupError) {
-    //         console.error(`Failed to delete file: ${audioPath}`, cleanupError);
-    //     }
-    // }
+    finally {
+        try {
+            if (fs.existsSync(audioPath)) {
+                await fsPromises.unlink(audioPath, () => {});
+                console.log(`Successfully deleted: ${audioPath}`);
+            }
+        } catch (cleanupError) {
+            console.error(`Failed to delete file: ${audioPath}`, cleanupError);
+        }
+    }
 }
 }
 
