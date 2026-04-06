@@ -25,7 +25,6 @@ export function Navbar() {
 
   const navLinks = ['Features', 'How it works', 'Pricing', 'API'];
 
-  // Dashboard navbar - shows user info and dropdown (only when authenticated)
   if (isDashboard && isAuthenticated) {
     return (
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -85,18 +84,6 @@ export function Navbar() {
                             {user?.email || user?.name || 'User'}
                           </p>
                         </div>
-                        
-                        <button
-                          onClick={() => {
-                            router.push('/dashboard');
-                            setShowUserMenu(false);
-                          }}
-                          className="w-full px-4 py-2.5 text-left text-sm text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-3"
-                        >
-                          <LayoutDashboard className="w-4 h-4" />
-                          Dashboard
-                        </button>
-                        
                         <div className="h-px bg-zinc-800 mx-2 my-1" />
 
                         <button
