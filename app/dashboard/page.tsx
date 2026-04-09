@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/hooks/useAuth';
 import { VideoUploader } from '../components/VideoUploader';
@@ -16,10 +16,11 @@ export default function DashboardPage() {
   const [processingStep, setProcessingStep] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  if (!authLoading && !isAuthenticated) {
-    router.push('/');
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleVideoUpload = async (file: File) => {
     setIsProcessing(true);

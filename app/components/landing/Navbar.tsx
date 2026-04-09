@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
-import { Captions, ChevronDown, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { Captions, ChevronDown, LogOut, User } from 'lucide-react';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
