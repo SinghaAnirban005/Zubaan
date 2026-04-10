@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { isAuthenticated, getUser } from '@/lib/auth';
 import { api } from '@/lib/api';
 
@@ -11,24 +11,34 @@ export function useAuth() {
   const [authenticated, setAuthenticated] = useState(false);
 
   const router = useRouter();
+  const pathname = usePathname();
+
+  const checkAuth = () => {
+    const auth = isAuthenticated();
+    const userData = getUser();
+
+    if (auth && userData) {
+      setUser(userData);
+      setAuthenticated(true);
+    } else {
+      setUser(null);
+      setAuthenticated(false);
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const auth = isAuthenticated();
-      const userData = getUser();
-
-      if (auth && userData) {
-        setUser(userData);
-        setAuthenticated(true);
-      } else {
-        setAuthenticated(false);
-      }
-
-      setLoading(false);
-    };
-
     checkAuth();
-  }, []);
+
+    window.addEventListener('focus', checkAuth);
+    window.addEventListener('storage', checkAuth);
+
+    return () => {
+      window.removeEventListener('focus', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {

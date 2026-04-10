@@ -18,7 +18,7 @@ export default function Home() {
   useEffect(() => {
     if (!loading && user) {
       router.replace('/dashboard');
-      router.refresh()
+      // router.refresh()
     }
   }, [user, loading, router]);
 
@@ -36,7 +36,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black">
-      <Navbar />
       <Hero onGetStarted={loginWithGoogle} isAuthenticated={!!user} />
       <Features />
       <HowItWorks />

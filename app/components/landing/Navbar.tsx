@@ -11,11 +11,11 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   
-  const isDashboard = pathname === '/dashboard';
+  // const isDashboard = pathname === '/dashboard';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -25,7 +25,9 @@ export function Navbar() {
 
   const navLinks = ['Features', 'How it works', 'Pricing', 'API'];
 
-  if (isDashboard && isAuthenticated) {
+  if (loading) return null;
+
+  if (isAuthenticated) {
     return (
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         scrolled ? 'bg-black/90 backdrop-blur-xl border-b border-zinc-800' : 'bg-transparent'
